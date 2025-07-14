@@ -4,6 +4,7 @@ Created by Florent Poux, (c) 2024 Licence MIT
 Learn more at: learngeodata.eu
 Modified with noise generation.
 """
+import os
 
 import numpy as np
 import open3d as o3d
@@ -103,44 +104,48 @@ def generate_random_point_cloud(num_points=5000, num_shapes=1, shape_type=None,
         shape_pts = np.column_stack((x, y, z)) + shape_center
         points.append(shape_pts)
 
+        shape_data = {
+            'points': shape_pts,
+            'type': current_shape,
+            'center': shape_center,
+            'radius': radius if 'sphere' in current_shape else None,
+            'size': size if current_shape in ['cube', 'plane'] else None
+        }
+        all_shapes_data.append(shape_data)
+
 
     # Соединение точек и приведение к точности float64
     points_formatted = np.vstack(points).astype(np.float64)
 
-    #TODO: FIX Data connection to each figure
-    shape_data = {
-        'points': shape_pts,
-        'type': current_shape,
-        'center': shape_center,
-        'radius': radius if 'sphere' in current_shape else None,
-        'size': size if current_shape in ['cube', 'plane'] else None
-    }
-    all_shapes_data.append(shape_data)
+
 
     # Добавление шума
     if noise_type:
         points_formatted = points_formatted + np.random.normal(0, noise_intensity, points_formatted.shape).astype(
             np.float64)
 
-    # Сохранение общей картины
-    np.save("points.npy", points_formatted)
-    x, y, z = points_formatted[:, 0], points_formatted[:, 1], points_formatted[:, 2]
-    np.save("x.npy", x)
-    np.save("y.npy", y)
-    np.save("z.npy", z)
+    # Создание каталогов для хранения файлов
+    os.makedirs("Point_Generator_Output", exist_ok=True)
+    os.makedirs(os.path.join("Point_Generator_Output", "full_cloud"), exist_ok=True)
 
-    # сохранение каждой фигуры по отдельности
+    # Сохранение полного облака точек (inside Point_Generator_Output/full_cloud/)
+    full_cloud_path = os.path.join("Point_Generator_Output", "full_cloud")
+    np.save(os.path.join(full_cloud_path, "points.npy"), points_formatted)
+    x, y, z = points_formatted[:, 0], points_formatted[:, 1], points_formatted[:, 2]
+    np.save(os.path.join(full_cloud_path, "x.npy"), x)
+    np.save(os.path.join(full_cloud_path, "y.npy"), y)
+    np.save(os.path.join(full_cloud_path, "z.npy"), z)
+
+    # Сохранение координат отдельных фигур (inside Point_Generator_Output/)
     for i, shape in enumerate(all_shapes_data):
         shape_points = shape['points']
         shape_prefix = f"shape_{i}_{shape['type']}"
+        base_path = os.path.join("Point_Generator_Output", shape_prefix)
 
-        # Save points
-        np.save(f"{shape_prefix}_points.npy", shape_points)
-
-        # Save coordinates
-        np.save(f"{shape_prefix}_x.npy", shape_points[:, 0])
-        np.save(f"{shape_prefix}_y.npy", shape_points[:, 1])
-        np.save(f"{shape_prefix}_z.npy", shape_points[:, 2])
+        np.save(f"{base_path}_points.npy", shape_points)
+        np.save(f"{base_path}_x.npy", shape_points[:, 0])
+        np.save(f"{base_path}_y.npy", shape_points[:, 1])
+        np.save(f"{base_path}_z.npy", shape_points[:, 2])
 
     return points_formatted
 
