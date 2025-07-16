@@ -26,27 +26,15 @@ for f in pcd_files:
 if len(combined.points) == 0:
     sys.exit("Every file was empty; nothing to visualise.")
 
-# ---- 2. Save & reload (optional but neat) ------------------------------------
 o3d.io.write_point_cloud(output_path, combined, write_ascii=True)
 print(f"\nCombined cloud has {len(combined.points):,} points → {output_path}")
 
-# ---- 3. Visualise ------------------------------------------------------------
+# ---- Visualise ------------------------------------------------------------
 coord = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0)
 
-# The one‑liner version (easiest to get working):
 o3d.visualization.draw_geometries(
     [combined, coord],
     window_name="Combined PCDs",
     point_show_normal=False,
     width=1280, height=720
 )
-
-# ── OR ── full Visualizer control (uncomment if you need camera callbacks):
-vis = o3d.visualization.Visualizer()
-vis.create_window(window_name="Combined PCDs")
-vis.add_geometry(combined)
-vis.add_geometry(coord)
-vis.get_render_option().point_size = 2
-vis.poll_events(); vis.update_renderer()
-vis.run()                 # ← blocks until window closed
-vis.destroy_window()

@@ -125,22 +125,22 @@ def generate_random_point_cloud(num_points=5000, num_shapes=1, shape_type=None,
             np.float64)
 
     # Создание каталогов для хранения файлов
-    os.makedirs("Point_Generator_Output", exist_ok=True)
-    os.makedirs(os.path.join("Point_Generator_Output", "full_cloud"), exist_ok=True)
+    os.makedirs("point_generator_output", exist_ok=True)
+    os.makedirs(os.path.join("point_generator_output", "full_cloud"), exist_ok=True)
 
-    # Сохранение полного облака точек (inside Point_Generator_Output/full_cloud/)
-    full_cloud_path = os.path.join("Point_Generator_Output", "full_cloud")
+    # Сохранение полного облака точек (inside point_generator_output/full_cloud/)
+    full_cloud_path = os.path.join("point_generator_output", "full_cloud")
     np.save(os.path.join(full_cloud_path, "points.npy"), points_formatted)
     x, y, z = points_formatted[:, 0], points_formatted[:, 1], points_formatted[:, 2]
     np.save(os.path.join(full_cloud_path, "x.npy"), x)
     np.save(os.path.join(full_cloud_path, "y.npy"), y)
     np.save(os.path.join(full_cloud_path, "z.npy"), z)
 
-    # Сохранение координат отдельных фигур (inside Point_Generator_Output/)
+    # Сохранение координат отдельных фигур (inside point_generator_output/)
     for i, shape in enumerate(all_shapes_data):
         shape_points = shape['points']
         shape_prefix = f"shape_{i}_{shape['type']}"
-        base_path = os.path.join("Point_Generator_Output", shape_prefix)
+        base_path = os.path.join("point_generator_output", shape_prefix)
 
         np.save(f"{base_path}_points.npy", shape_points)
         np.save(f"{base_path}_x.npy", shape_points[:, 0])
