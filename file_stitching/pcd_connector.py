@@ -16,7 +16,7 @@ class NormalAwareRegistrator:
             pcd.estimate_normals(
                 search_param=o3d.geometry.KDTreeSearchParamHybrid(
                     radius=self.normal_radius,
-                    max_nn=50))
+                    max_nn=10))
 
         # Проверка валидности нормалей
         norms = np.asarray(pcd.normals)
@@ -34,7 +34,7 @@ class NormalAwareRegistrator:
             if len(pcd.points) == 0:
                 raise ValueError("Пустое облако после фильтрации")
 
-            # Адаптивный даунсемплинг
+
             current_size = len(pcd.points)
             if current_size > self.max_points:
                 # Сохраняем долю оригинальных точек
@@ -45,8 +45,8 @@ class NormalAwareRegistrator:
 
                 pcd = pcd.voxel_down_sample(self.voxel_size)
 
-                # Убедимся, что не переборщили с уменьшением
-                if len(pcd.points) < 100:  # Минимальное разумное количество
+
+                if len(pcd.points) < 100:
                     pcd = pcd.voxel_down_sample(self.voxel_size * 2)
 
             else:
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     # Настройки для сложных данных
     registrar = NormalAwareRegistrator(
-        voxel_size=0.1,
+        voxel_size= 0.1,
         normal_radius=1,
         max_points=70000
     )
